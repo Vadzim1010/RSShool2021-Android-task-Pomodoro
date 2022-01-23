@@ -49,15 +49,28 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
         toast.show()
     }
 
-    override fun start() {
-        TODO("Not yet implemented")
+    override fun start(id: Int) {
+        changeStopwatch(id, null, true)
     }
 
-    override fun stop() {
-        TODO("Not yet implemented")
+    override fun stop(id: Int, currentMs: Long?) {
+        changeStopwatch(id, currentMs, false)
     }
 
-    override fun delete() {
-        TODO("Not yet implemented")
+    override fun delete(id: Int) {
+        stopwatches.remove(stopwatches.find { it.id == id })
+        stopwatchAdapter.submitList(stopwatches.toList())
+    }
+
+    private fun changeStopwatch(id: Int, currentMs: Long?, isStarted: Boolean) {
+        stopwatches.forEach {
+            if (it.id == id) {
+                stopwatches[stopwatches.indexOf(it)] =
+                    Stopwatch(id, currentMs ?: it.currentMs, isStarted)
+            } else {
+                stopwatches[stopwatches.indexOf(it)] = it
+            }
+        }
+        stopwatchAdapter.submitList(stopwatches.toList())
     }
 }
