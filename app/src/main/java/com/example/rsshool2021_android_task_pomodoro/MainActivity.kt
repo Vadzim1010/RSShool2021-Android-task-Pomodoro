@@ -10,6 +10,7 @@ import com.example.rsshool2021_android_task_pomodoro.databinding.ActivityMainBin
 class MainActivity : AppCompatActivity(), StopwatchListener {
 
     private var nextId = 0
+    private var startTime = 0L
     private val stopwatchAdapter = StopwatchAdapter(this)
     private val stopwatches = mutableListOf<Stopwatch>()
     private lateinit var binding: ActivityMainBinding
@@ -24,6 +25,8 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
             adapter = stopwatchAdapter
         }
 
+        startTime = System.currentTimeMillis()
+
         val intent = Intent(this, ForegroundService::class.java)
         startService(intent)
 
@@ -31,7 +34,12 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
             if (getStartedTime() == 0L) {
                 getToast()
             } else {
-                stopwatches.add(Stopwatch(nextId++, getStartedTime(), false))
+                stopwatches.add(Stopwatch(
+                    nextId++,
+                    getStartedTime(),
+                    0L,
+                    0L,
+                    false))
                 stopwatchAdapter.submitList(stopwatches.toList())
             }
         }
@@ -50,11 +58,11 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
     }
 
     override fun start(id: Int) {
-        changeStopwatch(id, null, true)
+        changeStopwatch(id, null, System.currentTimeMillis(), 0L, true)
     }
 
-    override fun stop(id: Int, currentMs: Long?) {
-        changeStopwatch(id, currentMs, false)
+    override fun stop(id: Int, displayTimeMs: Long?, runningTimeMs: Long) {
+        changeStopwatch(id, displayTimeMs, null, runningTimeMs, false)
     }
 
     override fun delete(id: Int) {
@@ -62,13 +70,42 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
         stopwatchAdapter.submitList(stopwatches.toList())
     }
 
-    private fun changeStopwatch(id: Int, currentMs: Long?, isStarted: Boolean) {
+    private fun changeStopwatch(
+        id: Int,
+        displayTimeMs: Long?,
+        systemStaticTimeMs: Long?,
+        runningTimeMs: Long,
+        isStarted: Boolean,
+    ) {
         stopwatches.forEach {
-            if (it.id == id) {
+            if (it.id == id && runningTimeMs == 0L) {
                 stopwatches[stopwatches.indexOf(it)] =
-                    Stopwatch(id, currentMs ?: it.currentMs, isStarted)
+                    Stopwatch(it.id,
+                        displayTimeMs ?: it.displayTimeMs,
+                        systemStaticTimeMs ?: it.systemStaticTimeMs,
+                        runningTimeMs,
+                        isStarted)
+            } else if (it.id == id) {
+                stopwatches[stopwatches.indexOf(it)] =
+                    Stopwatch(it.id,
+                        runningTimeMs,
+                        systemStaticTimeMs ?: it.systemStaticTimeMs,
+                        0L,
+                        isStarted)
+            } else if (it.id != id && it.runningTimeMs == 0L) {
+                stopwatches[stopwatches.indexOf(it)] =
+                    Stopwatch(it.id,
+                        it.displayTimeMs,
+                        it.systemStaticTimeMs,
+                        it.runningTimeMs,
+                        false)
             } else {
-                stopwatches[stopwatches.indexOf(it)] = it
+                stopwatches[stopwatches.indexOf(it)] =
+                    Stopwatch(it.id,
+                        it.runningTimeMs,
+                        it.systemStaticTimeMs,
+                        0L,
+                        false)
             }
         }
         stopwatchAdapter.submitList(stopwatches.toList())

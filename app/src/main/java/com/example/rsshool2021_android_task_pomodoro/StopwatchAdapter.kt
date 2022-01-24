@@ -26,10 +26,11 @@ class StopwatchAdapter(
             }
 
             override fun areContentsTheSame(oldItem: Stopwatch, newItem: Stopwatch): Boolean {
-                return oldItem.currentMs == newItem.currentMs &&
-                        oldItem.isStarted == newItem.isStarted
+                return oldItem.displayTimeMs == newItem.displayTimeMs &&
+                        oldItem.isStarted == newItem.isStarted &&
+                        oldItem.systemStaticTimeMs == newItem.systemStaticTimeMs
             }
-
+            override fun getChangePayload(oldItem: Stopwatch, newItem: Stopwatch) = Any()
         }
     }
 }
