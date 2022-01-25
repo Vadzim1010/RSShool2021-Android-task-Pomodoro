@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.rsshool2021_android_task_pomodoro.databinding.ActivityMainBinding
 
@@ -11,14 +12,18 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
 
     private var nextId = 0
     private var startTime = 0L
-    private val stopwatchAdapter = StopwatchAdapter(this)
+    private val stopwatchAdapter = StopwatchAdapter(this, this)
+    private val stopwatchSorter = StopwatchSorter()
     private val stopwatches = mutableListOf<Stopwatch>()
+    private var color = 0
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        color = ContextCompat.getColor(this, R.color.white)
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -39,14 +44,16 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
                     getStartedTime(),
                     0L,
                     0L,
-                    false))
+                    isStarted = false,
+                    isFinished = false,
+                    color))
                 stopwatchAdapter.submitList(stopwatches.toList())
             }
         }
     }
 
     private fun getStartedTime(): Long {
-        return (binding.timeToSet.text.toString().toLongOrNull()?.times(1000) ?: 0) * 60
+        return (binding.timeToSet.text.toString().toLongOrNull()?.times(100) ?: 0) * 60
     }
 
     private fun getToast() {
@@ -58,56 +65,27 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
     }
 
     override fun start(id: Int) {
-        changeStopwatch(id, null, System.currentTimeMillis(), 0L, true)
+        stopwatchSorter.sort(stopwatches,
+            stopwatchAdapter,
+            id,
+            null,
+            System.currentTimeMillis(),
+            0L,
+            true)
     }
 
-    override fun stop(id: Int, displayTimeMs: Long?, runningTimeMs: Long) {
-        changeStopwatch(id, displayTimeMs, null, runningTimeMs, false)
+    override fun stop(id: Int, currentTimeMs: Long?, runningTimeMs: Long) {
+        stopwatchSorter.sort(stopwatches,
+            stopwatchAdapter,
+            id,
+            currentTimeMs,
+            null,
+            runningTimeMs,
+            false)
     }
 
     override fun delete(id: Int) {
         stopwatches.remove(stopwatches.find { it.id == id })
-        stopwatchAdapter.submitList(stopwatches.toList())
-    }
-
-    private fun changeStopwatch(
-        id: Int,
-        displayTimeMs: Long?,
-        systemStaticTimeMs: Long?,
-        runningTimeMs: Long,
-        isStarted: Boolean,
-    ) {
-        stopwatches.forEach {
-            if (it.id == id && runningTimeMs == 0L) {
-                stopwatches[stopwatches.indexOf(it)] =
-                    Stopwatch(it.id,
-                        displayTimeMs ?: it.displayTimeMs,
-                        systemStaticTimeMs ?: it.systemStaticTimeMs,
-                        runningTimeMs,
-                        isStarted)
-            } else if (it.id == id) {
-                stopwatches[stopwatches.indexOf(it)] =
-                    Stopwatch(it.id,
-                        runningTimeMs,
-                        systemStaticTimeMs ?: it.systemStaticTimeMs,
-                        0L,
-                        isStarted)
-            } else if (it.id != id && it.runningTimeMs == 0L) {
-                stopwatches[stopwatches.indexOf(it)] =
-                    Stopwatch(it.id,
-                        it.displayTimeMs,
-                        it.systemStaticTimeMs,
-                        it.runningTimeMs,
-                        false)
-            } else {
-                stopwatches[stopwatches.indexOf(it)] =
-                    Stopwatch(it.id,
-                        it.runningTimeMs,
-                        it.systemStaticTimeMs,
-                        0L,
-                        false)
-            }
-        }
         stopwatchAdapter.submitList(stopwatches.toList())
     }
 }

@@ -1,5 +1,6 @@
 package com.example.rsshool2021_android_task_pomodoro
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -7,12 +8,13 @@ import com.example.rsshool2021_android_task_pomodoro.databinding.RecyclerViewIte
 
 class StopwatchAdapter(
     private val listener: StopwatchListener,
+    private val context: Context,
 ) :
     androidx.recyclerview.widget.ListAdapter<Stopwatch, StopwatchViewHolder>(itemComparator) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StopwatchViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = RecyclerViewItemBinding.inflate(layoutInflater, parent, false)
-        return StopwatchViewHolder(binding, listener)
+        return StopwatchViewHolder(binding, listener, context)
     }
 
     override fun onBindViewHolder(holder: StopwatchViewHolder, position: Int) {
@@ -26,10 +28,9 @@ class StopwatchAdapter(
             }
 
             override fun areContentsTheSame(oldItem: Stopwatch, newItem: Stopwatch): Boolean {
-                return oldItem.displayTimeMs == newItem.displayTimeMs &&
-                        oldItem.isStarted == newItem.isStarted &&
-                        oldItem.systemStaticTimeMs == newItem.systemStaticTimeMs
+                return oldItem == newItem
             }
+
             override fun getChangePayload(oldItem: Stopwatch, newItem: Stopwatch) = Any()
         }
     }
