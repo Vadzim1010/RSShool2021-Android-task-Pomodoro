@@ -1,4 +1,6 @@
-package com.example.rsshool2021_android_task_pomodoro
+package com.example.rsshool2021_android_task_pomodoro.view.ui.main
+
+import com.example.rsshool2021_android_task_pomodoro.model.PomodoroTimer
 
 const val START_TIME = "00:00:00"
 const val INVALID = "INVALID"
@@ -17,6 +19,35 @@ fun Long.displayTime(): String {
     val s = this / 1000 % 60
 
     return "${displaySlot(h)}:${displaySlot(m)}:${displaySlot(s)}"
+}
+
+fun MutableList<PomodoroTimer>.sort(
+    id: Int,
+    currentTimeMs: Long?,
+    runningTimeMs: Long?,
+    isStarted: Boolean,
+) {
+    this.forEach {
+        if (it.getId() == id) {
+            this[this.indexOf(it)] = PomodoroTimer(
+                it.getId(),
+                currentTimeMs ?: it.getCurrentTimeMs(),
+                runningTimeMs ?: it.getRunningTimeMs(),
+                it.getStartedTimeMs(),
+                isStarted,
+                it.getIsFinished()
+            )
+        } else {
+            this[this.indexOf(it)] = PomodoroTimer(
+                it.getId(),
+                it.getCurrentTimeMs(),
+                it.getRunningTimeMs(),
+                it.getStartedTimeMs(),
+                false,
+                it.getIsFinished()
+            )
+        }
+    }
 }
 
 private fun displaySlot(count: Long): String {

@@ -8,19 +8,17 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.rsshool2021_android_task_pomodoro.view.ui.service.ForegroundService
 import com.example.rsshool2021_android_task_pomodoro.R
-import com.example.rsshool2021_android_task_pomodoro.view.data.StopwatchSorter
 import com.example.rsshool2021_android_task_pomodoro.databinding.ActivityMainBinding
-import com.example.rsshool2021_android_task_pomodoro.model.Stopwatch
-import com.example.rsshool2021_android_task_pomodoro.view.adapter.StopwatchAdapter
+import com.example.rsshool2021_android_task_pomodoro.model.PomodoroTimer
+import com.example.rsshool2021_android_task_pomodoro.view.adapter.PomodoroTimerAdapter
 
-class MainActivity : AppCompatActivity(), StopwatchListener {
+class MainActivity : AppCompatActivity(), PomodoroTimerListener {
 
     private var nextId = 0
-    private var startTime = 0L
     private var color = 0
-    private val stopwatches = mutableListOf<Stopwatch>()
-    private val stopwatchAdapter = StopwatchAdapter(this)
-    private val stopwatchSorter = StopwatchSorter()
+    private var runningTime = 0L
+    private val stopwatches = mutableListOf<PomodoroTimer>()
+    private val stopwatchAdapter = PomodoroTimerAdapter(this)
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +28,6 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
 
         val intent = Intent(this, ForegroundService::class.java)
         color = ContextCompat.getColor(this, R.color.white)
-        startTime = System.currentTimeMillis()
 
         startService(intent)
 
@@ -43,14 +40,14 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
             if (getStartedTime() == 0L) {
                 getToast()
             } else {
-                stopwatches.add(Stopwatch(
+                runningTime = System.currentTimeMillis() + getStartedTime()
+                stopwatches.add(PomodoroTimer(
                     nextId++,
                     getStartedTime(),
-                    0L,
+                    runningTime,
                     0L,
                     isStarted = false,
-                    isFinished = false,
-                    color))
+                    isFinished = false))
                 stopwatchAdapter.submitList(stopwatches.toList())
             }
         }
@@ -68,24 +65,15 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
         toast.show()
     }
 
-    override fun start(id: Int) {
-        stopwatchSorter.sort(stopwatches,
-            stopwatchAdapter,
-            id,
-            null,
-            System.currentTimeMillis(),
-            0L,
-            true)
+    override fun start(id: Int, currentTimeMs: Long) {
+        runningTime = System.currentTimeMillis() + currentTimeMs
+        stopwatches.sort(id, null, runningTime, true)
+        stopwatchAdapter.submitList(stopwatches.toList())
     }
 
-    override fun stop(id: Int, currentTimeMs: Long?, runningTimeMs: Long) {
-        stopwatchSorter.sort(stopwatches,
-            stopwatchAdapter,
-            id,
-            currentTimeMs,
-            null,
-            runningTimeMs,
-            false)
+    override fun stop(id: Int, currentTimeMs: Long?) {
+        stopwatches.sort(id, currentTimeMs, null, false)
+        stopwatchAdapter.submitList(stopwatches.toList())
     }
 
     override fun delete(id: Int) {

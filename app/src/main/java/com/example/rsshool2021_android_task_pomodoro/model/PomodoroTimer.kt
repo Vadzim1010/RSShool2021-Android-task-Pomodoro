@@ -1,13 +1,12 @@
 package com.example.rsshool2021_android_task_pomodoro.model
 
-data class Stopwatch(
+data class PomodoroTimer(
     private val id: Int,
-    private var currentTimeMs: Long,
-    private var systemStaticTimeMs: Long,
-    private var runningTimeMs: Long,
-    private var isStarted: Boolean,
-    private var isFinished: Boolean,
-    private var backGroundColor: Int,
+    private var currentTimeMs: Long, // to display this on screen
+    private var runningTimeMs: Long, // to count time correct in timer(with System time)
+    private var startedTimeMs: Long, // save started time to display it when timer is finished
+    private var isStarted: Boolean, // to know timer state
+    private var isFinished: Boolean, // to know when the time is up
 ) {
     fun getId(): Int {
         return id
@@ -17,8 +16,8 @@ data class Stopwatch(
         return currentTimeMs
     }
 
-    fun getSystemStaticTimeMs(): Long {
-        return systemStaticTimeMs
+    fun setCurrentTimeMs(currentTimeMs: Long) {
+        this.currentTimeMs = currentTimeMs
     }
 
     fun getRunningTimeMs(): Long {
@@ -27,6 +26,14 @@ data class Stopwatch(
 
     fun setRunningTimeMs(runningTimeMs: Long) {
         this.runningTimeMs = runningTimeMs
+    }
+
+    fun getStartedTimeMs(): Long {
+        return startedTimeMs
+    }
+
+    fun setStartedTimeMs(runningTimeMs: Long) {
+        this.startedTimeMs = runningTimeMs
     }
 
     fun getIsStarted(): Boolean {
@@ -43,13 +50,5 @@ data class Stopwatch(
 
     fun setIsFinished(isFinished: Boolean) {
         this.isFinished = isFinished
-    }
-
-    fun getBackGroundColor(): Int {
-        return backGroundColor
-    }
-
-    fun setBackGroundColor(backGroundColor: Int) {
-        this.backGroundColor = backGroundColor
     }
 }
