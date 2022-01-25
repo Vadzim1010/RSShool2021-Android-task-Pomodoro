@@ -1,4 +1,4 @@
-package com.example.rsshool2021_android_task_pomodoro
+package com.example.rsshool2021_android_task_pomodoro.view.ui.main
 
 interface StopwatchListener {
     fun start(id: Int)

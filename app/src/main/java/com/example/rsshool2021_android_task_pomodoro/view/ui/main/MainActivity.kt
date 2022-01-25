@@ -1,4 +1,4 @@
-package com.example.rsshool2021_android_task_pomodoro
+package com.example.rsshool2021_android_task_pomodoro.view.ui.main
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,16 +6,21 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.rsshool2021_android_task_pomodoro.view.ui.service.ForegroundService
+import com.example.rsshool2021_android_task_pomodoro.R
+import com.example.rsshool2021_android_task_pomodoro.view.data.StopwatchSorter
 import com.example.rsshool2021_android_task_pomodoro.databinding.ActivityMainBinding
+import com.example.rsshool2021_android_task_pomodoro.model.Stopwatch
+import com.example.rsshool2021_android_task_pomodoro.view.adapter.StopwatchAdapter
 
 class MainActivity : AppCompatActivity(), StopwatchListener {
 
     private var nextId = 0
     private var startTime = 0L
-    private val stopwatchAdapter = StopwatchAdapter(this, this)
-    private val stopwatchSorter = StopwatchSorter()
-    private val stopwatches = mutableListOf<Stopwatch>()
     private var color = 0
+    private val stopwatches = mutableListOf<Stopwatch>()
+    private val stopwatchAdapter = StopwatchAdapter(this)
+    private val stopwatchSorter = StopwatchSorter()
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,17 +28,16 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val intent = Intent(this, ForegroundService::class.java)
         color = ContextCompat.getColor(this, R.color.white)
+        startTime = System.currentTimeMillis()
+
+        startService(intent)
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = stopwatchAdapter
         }
-
-        startTime = System.currentTimeMillis()
-
-        val intent = Intent(this, ForegroundService::class.java)
-        startService(intent)
 
         binding.addTimerButton.setOnClickListener {
             if (getStartedTime() == 0L) {
@@ -85,7 +89,7 @@ class MainActivity : AppCompatActivity(), StopwatchListener {
     }
 
     override fun delete(id: Int) {
-        stopwatches.remove(stopwatches.find { it.id == id })
+        stopwatches.remove(stopwatches.find { it.getId() == id })
         stopwatchAdapter.submitList(stopwatches.toList())
     }
 }

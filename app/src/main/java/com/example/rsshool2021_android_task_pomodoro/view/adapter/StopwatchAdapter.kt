@@ -1,20 +1,20 @@
-package com.example.rsshool2021_android_task_pomodoro
+package com.example.rsshool2021_android_task_pomodoro.view.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import com.example.rsshool2021_android_task_pomodoro.view.ui.main.StopwatchListener
 import com.example.rsshool2021_android_task_pomodoro.databinding.RecyclerViewItemBinding
+import com.example.rsshool2021_android_task_pomodoro.model.Stopwatch
 
 class StopwatchAdapter(
     private val listener: StopwatchListener,
-    private val context: Context,
 ) :
     androidx.recyclerview.widget.ListAdapter<Stopwatch, StopwatchViewHolder>(itemComparator) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StopwatchViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = RecyclerViewItemBinding.inflate(layoutInflater, parent, false)
-        return StopwatchViewHolder(binding, listener, context)
+        return StopwatchViewHolder(binding, listener, binding.root.context)
     }
 
     override fun onBindViewHolder(holder: StopwatchViewHolder, position: Int) {
@@ -24,7 +24,7 @@ class StopwatchAdapter(
     private companion object {
         private val itemComparator = object : DiffUtil.ItemCallback<Stopwatch>() {
             override fun areItemsTheSame(oldItem: Stopwatch, newItem: Stopwatch): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.getId() == newItem.getId()
             }
 
             override fun areContentsTheSame(oldItem: Stopwatch, newItem: Stopwatch): Boolean {

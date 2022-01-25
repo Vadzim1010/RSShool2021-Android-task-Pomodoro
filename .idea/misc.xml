@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/AndroidStudioProjects/RSShool2021AndroidtaskPomodoro/app/src/main/res/drawable/blinking_circle.xml" value="0.37864583333333335" />
+        <entry key="..\:/Android/AndroidStudioProjects/RSShool2021AndroidtaskPomodoro/app/src/main/res/drawable/circle.xml" value="0.37864583333333335" />
         <entry key="..\:/Android/AndroidStudioProjects/RSShool2021AndroidtaskPomodoro/app/src/main/res/drawable/ic_baseline_delete_forever_24.xml" value="0.21875" />
         <entry key="..\:/Android/AndroidStudioProjects/RSShool2021AndroidtaskPomodoro/app/src/main/res/drawable/ic_baseline_radio_button_checked_24.xml" value="0.21875" />
         <entry key="..\:/Android/AndroidStudioProjects/RSShool2021AndroidtaskPomodoro/app/src/main/res/layout/activity_main.xml" value="0.5" />

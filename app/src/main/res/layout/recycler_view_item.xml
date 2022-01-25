@@ -23,11 +23,11 @@
 
             <ImageView
                 android:id="@+id/dot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
                 android:layout_gravity="center"
-                android:layout_weight="1"
-                android:src="@drawable/ic_baseline_radio_button_checked_24"
+                android:layout_marginStart="20dp"
+                android:background="@drawable/blinking_circle"
                 app:tint="@color/black" />
 
 
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center"
                 android:layout_weight="1"
-                android:backgroundTint="#FFFFFF"
+                android:backgroundTint="#00000000"
                 android:src="@drawable/ic_baseline_delete_forever_24"
                 app:tint="@color/black" />
         </LinearLayout>
