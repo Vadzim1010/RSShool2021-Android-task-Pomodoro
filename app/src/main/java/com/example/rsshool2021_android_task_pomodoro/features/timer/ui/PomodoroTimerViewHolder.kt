@@ -1,4 +1,4 @@
-package com.example.rsshool2021_android_task_pomodoro.view.adapter
+package com.example.rsshool2021_android_task_pomodoro.features.timer.ui
 
 import android.content.Context
 import android.graphics.drawable.AnimationDrawable
@@ -7,10 +7,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rsshool2021_android_task_pomodoro.R
-import com.example.rsshool2021_android_task_pomodoro.view.ui.main.PomodoroTimerListener
 import com.example.rsshool2021_android_task_pomodoro.databinding.RecyclerViewItemBinding
-import com.example.rsshool2021_android_task_pomodoro.view.ui.main.displayTime
-import com.example.rsshool2021_android_task_pomodoro.model.PomodoroTimer
+import com.example.rsshool2021_android_task_pomodoro.eventbus.WorkingTimerEvent
+import com.example.rsshool2021_android_task_pomodoro.features.timer.model.PomodoroTimer
+import org.greenrobot.eventbus.EventBus
 
 class PomodoroTimerViewHolder(
     private val binding: RecyclerViewItemBinding,
@@ -27,6 +27,10 @@ class PomodoroTimerViewHolder(
         binding.timer.text = pomodoroTimer.getCurrentTimeMs().displayTime()
         purpule = ContextCompat.getColor(context, R.color.purple_200)
         wite = ContextCompat.getColor(context, R.color.white)
+
+        if (pomodoroTimer.getIsFinished()) {
+            setFinishedItemStyle(pomodoroTimer)
+        } else setItemStyle(pomodoroTimer)
 
         if (pomodoroTimer.getIsStarted()) {
             startTimer(pomodoroTimer)
@@ -53,11 +57,14 @@ class PomodoroTimerViewHolder(
     }
 
     private fun startTimer(pomodoroTimer: PomodoroTimer) {
+
         setItemStyle(pomodoroTimer)
 
         timer?.cancel()
         timer = getCountDownTimer(pomodoroTimer)
         timer?.start()
+
+
 
         binding.dot.isInvisible = false
         (binding.dot.background as? AnimationDrawable)?.start()
@@ -66,7 +73,8 @@ class PomodoroTimerViewHolder(
     private fun stopTimer(pomodoroTimer: PomodoroTimer) {
         setItemStyle(pomodoroTimer)
 
-        timer?.cancel()
+ timer?.cancel()
+
 
         binding.dot.isInvisible = true
         (binding.dot.background as? AnimationDrawable)?.stop()
@@ -76,7 +84,6 @@ class PomodoroTimerViewHolder(
         if (!pomodoroTimer.getIsFinished()) {
             binding.cardView.setCardBackgroundColor(wite)
         } else binding.cardView.setCardBackgroundColor(purpule)
-
         if (pomodoroTimer.getIsStarted()) {
             binding.startStopButton.text = context.getString(R.string.stop)
         } else {
@@ -84,31 +91,24 @@ class PomodoroTimerViewHolder(
         }
     }
 
-    private fun setFinishedItemStyle(pomodoroTimer: PomodoroTimer) {
+    private fun setFinishedItemStyle(pomodoroTimer: PomodoroTimer) = binding.apply {
         if (pomodoroTimer.getIsFinished()) {
-            with(binding) {
-                startStopButton.isEnabled = false
-                startStopButton.text = context.getString(R.string.start)
-                cardView.setCardBackgroundColor(purpule)
-                dot.isInvisible = true
-                (dot.background as? AnimationDrawable)?.stop()
-            }
+            startStopButton.isEnabled = false
+            startStopButton.text = context.getString(R.string.start)
+            cardView.setCardBackgroundColor(purpule)
+            dot.isInvisible = true
+            (dot.background as? AnimationDrawable)?.stop()
         }
     }
 
-    private fun getCountDownTimer(pomodoroTimer: PomodoroTimer): CountDownTimer {
+private fun getCountDownTimer(pomodoroTimer: PomodoroTimer): CountDownTimer {
         return object : CountDownTimer(pomodoroTimer.getCurrentTimeMs(), UNIT_TEN_MS) {
 
             override fun onTick(p0: Long) {
-                if (pomodoroTimer.getStartedTimeMs() <= 0L) {
-                    pomodoroTimer.setIsFinished(true)
-                    pomodoroTimer.setIsStarted(false)
-                    setFinishedItemStyle(pomodoroTimer)
-                }
                 binding.timer.text = pomodoroTimer.getCurrentTimeMs().displayTime()
                 pomodoroTimer.setCurrentTimeMs(pomodoroTimer.getRunningTimeMs() - System.currentTimeMillis())
                 pomodoroTimer.setStartedTimeMs(pomodoroTimer.getCurrentTimeMs())
-
+                EventBus.getDefault().post(WorkingTimerEvent(pomodoroTimer.getCurrentTimeMs()))
             }
 
             override fun onFinish() {
@@ -118,6 +118,7 @@ class PomodoroTimerViewHolder(
             }
         }
     }
+
 
     private companion object {
         private const val UNIT_TEN_MS = 100L

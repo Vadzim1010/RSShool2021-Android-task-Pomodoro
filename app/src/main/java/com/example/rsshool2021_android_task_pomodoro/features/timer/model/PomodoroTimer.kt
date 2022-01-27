@@ -1,4 +1,4 @@
-package com.example.rsshool2021_android_task_pomodoro.model
+package com.example.rsshool2021_android_task_pomodoro.features.timer.model
 
 data class PomodoroTimer(
     private val id: Int,

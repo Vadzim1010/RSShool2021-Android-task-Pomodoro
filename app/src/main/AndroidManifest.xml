@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RSShool2021AndroidtaskPomodoro">
         <activity
-            android:name=".view.ui.main.MainActivity"
+            android:name=".features.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".view.ui.service.ForegroundService" />
+        <service android:name=".features.foregroundservice.ForegroundService" />
     </application>
 
 </manifest>

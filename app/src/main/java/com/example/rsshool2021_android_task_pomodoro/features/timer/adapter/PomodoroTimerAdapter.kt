@@ -1,11 +1,12 @@
-package com.example.rsshool2021_android_task_pomodoro.view.adapter
+package com.example.rsshool2021_android_task_pomodoro.features.timer.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import com.example.rsshool2021_android_task_pomodoro.view.ui.main.PomodoroTimerListener
+import com.example.rsshool2021_android_task_pomodoro.features.timer.ui.PomodoroTimerListener
 import com.example.rsshool2021_android_task_pomodoro.databinding.RecyclerViewItemBinding
-import com.example.rsshool2021_android_task_pomodoro.model.PomodoroTimer
+import com.example.rsshool2021_android_task_pomodoro.features.timer.ui.PomodoroTimerViewHolder
+import com.example.rsshool2021_android_task_pomodoro.features.timer.model.PomodoroTimer
 
 class PomodoroTimerAdapter(
     private val listener: PomodoroTimerListener,

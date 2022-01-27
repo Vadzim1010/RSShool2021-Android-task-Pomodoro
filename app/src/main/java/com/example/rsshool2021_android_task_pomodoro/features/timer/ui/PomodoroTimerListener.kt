@@ -1,4 +1,4 @@
-package com.example.rsshool2021_android_task_pomodoro.view.ui.main
+package com.example.rsshool2021_android_task_pomodoro.features.timer.ui
 
 interface PomodoroTimerListener {
     fun start(id: Int, currentTimeMs: Long)
