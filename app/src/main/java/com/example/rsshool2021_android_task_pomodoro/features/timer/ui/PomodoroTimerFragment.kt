@@ -9,12 +9,12 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.activity.addCallback
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.rsshool2021_android_task_pomodoro.R
 import com.example.rsshool2021_android_task_pomodoro.databinding.FragmentPomodoroTimerBinding
 import com.example.rsshool2021_android_task_pomodoro.features.timer.adapter.PomodoroTimerAdapter
 import com.example.rsshool2021_android_task_pomodoro.features.timer.model.PomodoroTimer
+import com.example.rsshool2021_android_task_pomodoro.utils.sort
 
-class PomodoroTimerFragment : Fragment(R.layout.fragment_pomodoro_timer), PomodoroTimerListener {
+class PomodoroTimerFragment : Fragment(), PomodoroTimerListener {
 
     private var nextId = 0
     private val pomodoroTimers = mutableListOf<PomodoroTimer>()
@@ -50,8 +50,8 @@ class PomodoroTimerFragment : Fragment(R.layout.fragment_pomodoro_timer), Pomodo
                 pomodoroTimers.add(PomodoroTimer(
                     nextId++,
                     getStartedTime(),
-                    System.currentTimeMillis() + getStartedTime(),
                     0L,
+                    getStartedTime(),
                     isStarted = false,
                     isFinished = false))
                 pomodoroTimerAdapter.submitList(pomodoroTimers.toList())
@@ -69,7 +69,7 @@ class PomodoroTimerFragment : Fragment(R.layout.fragment_pomodoro_timer), Pomodo
     }
 
     private fun getStartedTime(): Long {
-        return (binding.timeToSet.text.toString().toLongOrNull()?.times(100) ?: 0) * 60
+        return (binding.timeToSet.text.toString().toLongOrNull()?.times(1000) ?: 0) * 60
     }
 
     private fun getToast() {
@@ -81,15 +81,13 @@ class PomodoroTimerFragment : Fragment(R.layout.fragment_pomodoro_timer), Pomodo
     }
 
     override fun start(id: Int, currentTimeMs: Long) {
- val runningTime = System.currentTimeMillis() + currentTimeMs
+        val runningTime = System.currentTimeMillis() + currentTimeMs
         pomodoroTimers.sort(id, currentTimeMs, runningTime, true)
-
         pomodoroTimerAdapter.submitList(pomodoroTimers.toList())
     }
 
     override fun stop(id: Int, currentTimeMs: Long?) {
-  pomodoroTimers.sort(id, currentTimeMs, null, false)
-
+        pomodoroTimers.sort(id, currentTimeMs, null, false)
         pomodoroTimerAdapter.submitList(pomodoroTimers.toList())
     }
 

@@ -10,6 +10,8 @@ import com.example.rsshool2021_android_task_pomodoro.R
 import com.example.rsshool2021_android_task_pomodoro.databinding.RecyclerViewItemBinding
 import com.example.rsshool2021_android_task_pomodoro.eventbus.WorkingTimerEvent
 import com.example.rsshool2021_android_task_pomodoro.features.timer.model.PomodoroTimer
+import com.example.rsshool2021_android_task_pomodoro.utils.TIMER_INTERVAL
+import com.example.rsshool2021_android_task_pomodoro.utils.displayTime
 import org.greenrobot.eventbus.EventBus
 
 class PomodoroTimerViewHolder(
@@ -20,17 +22,14 @@ class PomodoroTimerViewHolder(
     RecyclerView.ViewHolder(binding.root) {
 
     private var timer: CountDownTimer? = null
-    private var purpule = 0
-    private var wite = 0
+    private var red = ContextCompat.getColor(context, R.color.red_200)
+    private var white = ContextCompat.getColor(context, R.color.white)
 
     fun bind(pomodoroTimer: PomodoroTimer) {
         binding.timer.text = pomodoroTimer.getCurrentTimeMs().displayTime()
-        purpule = ContextCompat.getColor(context, R.color.purple_200)
-        wite = ContextCompat.getColor(context, R.color.white)
-
-        if (pomodoroTimer.getIsFinished()) {
-            setFinishedItemStyle(pomodoroTimer)
-        } else setItemStyle(pomodoroTimer)
+        binding.startStopButton.isEnabled = !pomodoroTimer.getIsFinished()
+        binding.circleClock.setCurrent(pomodoroTimer.getCurrentTimeMs())
+        binding.circleClock.setPeriod(pomodoroTimer.getStartedTimeMs())
 
         if (pomodoroTimer.getIsStarted()) {
             startTimer(pomodoroTimer)
@@ -38,17 +37,23 @@ class PomodoroTimerViewHolder(
             stopTimer(pomodoroTimer)
         }
 
-        binding.startStopButton.isEnabled = !pomodoroTimer.getIsFinished()
+        if (pomodoroTimer.getIsFinished()) {
+            setFinishedItemStyle(pomodoroTimer)
+        } else setItemStyle(pomodoroTimer)
+
+
 
         initButtons(pomodoroTimer)
     }
 
     private fun initButtons(pomodoroTimer: PomodoroTimer) {
         binding.startStopButton.setOnClickListener {
-            if (pomodoroTimer.getIsStarted()) {
-                listener.stop(pomodoroTimer.getId(), pomodoroTimer.getCurrentTimeMs())
-            } else {
+            if (!pomodoroTimer.getIsStarted()) {
                 listener.start(pomodoroTimer.getId(), pomodoroTimer.getCurrentTimeMs())
+                EventBus.getDefault().post(WorkingTimerEvent(null))
+            } else {
+                EventBus.getDefault().post(WorkingTimerEvent(null))
+                listener.stop(pomodoroTimer.getId(), pomodoroTimer.getCurrentTimeMs())
             }
         }
         binding.delete.setOnClickListener {
@@ -57,14 +62,11 @@ class PomodoroTimerViewHolder(
     }
 
     private fun startTimer(pomodoroTimer: PomodoroTimer) {
-
         setItemStyle(pomodoroTimer)
 
         timer?.cancel()
         timer = getCountDownTimer(pomodoroTimer)
         timer?.start()
-
-
 
         binding.dot.isInvisible = false
         (binding.dot.background as? AnimationDrawable)?.start()
@@ -73,54 +75,54 @@ class PomodoroTimerViewHolder(
     private fun stopTimer(pomodoroTimer: PomodoroTimer) {
         setItemStyle(pomodoroTimer)
 
- timer?.cancel()
-
+        timer?.cancel()
 
         binding.dot.isInvisible = true
         (binding.dot.background as? AnimationDrawable)?.stop()
     }
 
-    private fun setItemStyle(pomodoroTimer: PomodoroTimer) {
+    private fun setItemStyle(pomodoroTimer: PomodoroTimer) = binding.run {
         if (!pomodoroTimer.getIsFinished()) {
-            binding.cardView.setCardBackgroundColor(wite)
-        } else binding.cardView.setCardBackgroundColor(purpule)
+            cardView.setCardBackgroundColor(white)
+        } else cardView.setCardBackgroundColor(red)
+
         if (pomodoroTimer.getIsStarted()) {
-            binding.startStopButton.text = context.getString(R.string.stop)
-        } else {
-            binding.startStopButton.text = context.getString(R.string.start)
-        }
+            startStopButton.text = context.getString(R.string.stop)
+        } else startStopButton.text = context.getString(R.string.start)
     }
 
     private fun setFinishedItemStyle(pomodoroTimer: PomodoroTimer) = binding.apply {
         if (pomodoroTimer.getIsFinished()) {
             startStopButton.isEnabled = false
             startStopButton.text = context.getString(R.string.start)
-            cardView.setCardBackgroundColor(purpule)
+            binding.timer.text = pomodoroTimer.getStartedTimeMs().displayTime()
+            cardView.setCardBackgroundColor(red)
             dot.isInvisible = true
             (dot.background as? AnimationDrawable)?.stop()
         }
     }
 
-private fun getCountDownTimer(pomodoroTimer: PomodoroTimer): CountDownTimer {
-        return object : CountDownTimer(pomodoroTimer.getCurrentTimeMs(), UNIT_TEN_MS) {
+    private fun getCountDownTimer(pomodoroTimer: PomodoroTimer): CountDownTimer {
+        return object :
+            CountDownTimer(pomodoroTimer.getRunningTimeMs() - System.currentTimeMillis(),
+                TIMER_INTERVAL) {
 
-            override fun onTick(p0: Long) {
-                binding.timer.text = pomodoroTimer.getCurrentTimeMs().displayTime()
+            override fun onTick(millisUntilFinished: Long) {
+                binding.circleClock.setCurrent(millisUntilFinished)
+
                 pomodoroTimer.setCurrentTimeMs(pomodoroTimer.getRunningTimeMs() - System.currentTimeMillis())
-                pomodoroTimer.setStartedTimeMs(pomodoroTimer.getCurrentTimeMs())
-                EventBus.getDefault().post(WorkingTimerEvent(pomodoroTimer.getCurrentTimeMs()))
+                binding.timer.text = pomodoroTimer.getCurrentTimeMs().displayTime()
+
+                EventBus.getDefault().post(WorkingTimerEvent(pomodoroTimer))
             }
 
             override fun onFinish() {
                 pomodoroTimer.setIsFinished(true)
                 pomodoroTimer.setIsStarted(false)
                 setFinishedItemStyle(pomodoroTimer)
+                binding.timer.text = pomodoroTimer.getStartedTimeMs().displayTime()
+                binding.circleClock.setCurrent(0)
             }
         }
-    }
-
-
-    private companion object {
-        private const val UNIT_TEN_MS = 100L
     }
 }

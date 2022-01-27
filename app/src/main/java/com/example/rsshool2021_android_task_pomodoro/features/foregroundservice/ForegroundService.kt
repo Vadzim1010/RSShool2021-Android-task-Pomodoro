@@ -14,7 +14,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.rsshool2021_android_task_pomodoro.R
 import com.example.rsshool2021_android_task_pomodoro.features.main.MainActivity
-import com.example.rsshool2021_android_task_pomodoro.features.timer.ui.*
+import com.example.rsshool2021_android_task_pomodoro.utils.*
 
 class ForegroundService : Service() {
 
@@ -119,11 +119,15 @@ class ForegroundService : Service() {
             override fun onTick(millisUntilFinished: Long) {
                 notificationManager?.notify(
                     NOTIFICATION_ID,
-                    getNotification((startTime - System.currentTimeMillis()).displayTime())
+                    getNotification(millisUntilFinished.displayTime())
                 )
             }
 
             override fun onFinish() {
+                notificationManager?.notify(
+                    NOTIFICATION_ID,
+                    getNotification(getString(R.string.time_is_up))
+                )
                 val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
                 val alarm = RingtoneManager.getRingtone(applicationContext, notification)
                 alarm.play()
@@ -140,6 +144,7 @@ class ForegroundService : Service() {
     }
 
     private companion object {
+        private const val INTERVAL = 1000L
         private const val NOTIFICATION_CHANNEL_ID = "Notification_Channel_Id"
         private const val NOTIFICATION_ID = 777
     }

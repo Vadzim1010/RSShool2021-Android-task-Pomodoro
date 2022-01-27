@@ -3,6 +3,7 @@ package com.example.rsshool2021_android_task_pomodoro.features.timer.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import com.example.rsshool2021_android_task_pomodoro.features.timer.ui.PomodoroTimerListener
 import com.example.rsshool2021_android_task_pomodoro.databinding.RecyclerViewItemBinding
 import com.example.rsshool2021_android_task_pomodoro.features.timer.ui.PomodoroTimerViewHolder
@@ -10,8 +11,8 @@ import com.example.rsshool2021_android_task_pomodoro.features.timer.model.Pomodo
 
 class PomodoroTimerAdapter(
     private val listener: PomodoroTimerListener,
-) :
-    androidx.recyclerview.widget.ListAdapter<PomodoroTimer, PomodoroTimerViewHolder>(itemComparator) {
+) : ListAdapter<PomodoroTimer, PomodoroTimerViewHolder>(itemComparator) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PomodoroTimerViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = RecyclerViewItemBinding.inflate(layoutInflater, parent, false)
@@ -24,11 +25,15 @@ class PomodoroTimerAdapter(
 
     private companion object {
         private val itemComparator = object : DiffUtil.ItemCallback<PomodoroTimer>() {
+
             override fun areItemsTheSame(oldItem: PomodoroTimer, newItem: PomodoroTimer): Boolean {
                 return oldItem.getId() == newItem.getId()
             }
 
-            override fun areContentsTheSame(oldItem: PomodoroTimer, newItem: PomodoroTimer): Boolean {
+            override fun areContentsTheSame(
+                oldItem: PomodoroTimer,
+                newItem: PomodoroTimer,
+            ): Boolean {
                 return oldItem == newItem
             }
 

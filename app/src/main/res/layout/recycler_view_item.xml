@@ -26,7 +26,8 @@
                 android:layout_width="8dp"
                 android:layout_height="8dp"
                 android:layout_gravity="center"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="15dp"
                 android:background="@drawable/blinking_circle"
                 app:tint="@color/black" />
 
@@ -36,12 +37,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="9"
+                android:layout_weight="5"
                 android:gravity="center"
                 android:text="00:00"
                 android:textColor="@color/black"
                 android:textSize="25sp" />
 
+            <com.example.rsshool2021_android_task_pomodoro.view.CircleClockCustomView
+                android:id="@+id/circleClock"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="30dp"
+                app:custom_color="?attr/colorPrimary"
+                app:custom_style="stroke"
+                app:layout_constraintHorizontal_bias="0.9" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/startStopButton"
@@ -50,7 +61,6 @@
                 android:layout_gravity="center|end"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_weight="1"
                 android:text="start" />
 
             <ImageButton
@@ -58,7 +68,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center"
-                android:layout_weight="1"
                 android:backgroundTint="#00000000"
                 android:src="@drawable/ic_baseline_delete_forever_24"
                 app:tint="@color/black" />
