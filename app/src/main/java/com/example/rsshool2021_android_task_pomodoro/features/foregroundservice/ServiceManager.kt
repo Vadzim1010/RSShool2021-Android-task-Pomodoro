@@ -19,7 +19,7 @@ class ServiceManager(
 ) : LifecycleEventObserver {
 
     private var pomodoroTimer: PomodoroTimer? = null
-    private var currentTime = 0L
+    private var runningMs: Long = 0L
 
     init {
         EventBus.getDefault().register(this)
@@ -28,6 +28,8 @@ class ServiceManager(
     @Subscribe
     fun onTimerEvent(event: WorkingTimerEvent) { // to get current time by EventBus
         pomodoroTimer = event.pomodoroTimer
+        runningMs = pomodoroTimer?.getCurrentTimeMs()?.plus(System.currentTimeMillis()) ?: 0
+
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
@@ -49,7 +51,7 @@ class ServiceManager(
         if (pomodoroTimer != null) {
             val startIntent = Intent(context, ForegroundService::class.java)
             startIntent.putExtra(COMMAND_ID, COMMAND_START)
-            startIntent.putExtra(CURRENT_TIME, pomodoroTimer?.getRunningTimeMs())
+            startIntent.putExtra(CURRENT_TIME, runningMs)
             context.startService(startIntent)
         }
     }

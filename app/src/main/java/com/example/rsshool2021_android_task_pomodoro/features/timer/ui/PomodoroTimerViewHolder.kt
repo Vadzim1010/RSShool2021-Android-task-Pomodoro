@@ -28,8 +28,10 @@ class PomodoroTimerViewHolder(
     fun bind(pomodoroTimer: PomodoroTimer) {
         binding.timer.text = pomodoroTimer.getCurrentTimeMs().displayTime()
         binding.startStopButton.isEnabled = !pomodoroTimer.getIsFinished()
+
         binding.circleClock.setCurrent(pomodoroTimer.getCurrentTimeMs())
         binding.circleClock.setPeriod(pomodoroTimer.getStartedTimeMs())
+
 
         if (pomodoroTimer.getIsStarted()) {
             startTimer(pomodoroTimer)
@@ -37,48 +39,56 @@ class PomodoroTimerViewHolder(
             stopTimer(pomodoroTimer)
         }
 
-        if (pomodoroTimer.getIsFinished()) {
+        if (pomodoroTimer.getIsFinished()) { // set style or finished style if item time is up
             setFinishedItemStyle(pomodoroTimer)
         } else setItemStyle(pomodoroTimer)
 
-
-
-        initButtons(pomodoroTimer)
+        initButtons(pomodoroTimer)// set buttons listeners
     }
 
     private fun initButtons(pomodoroTimer: PomodoroTimer) {
         binding.startStopButton.setOnClickListener {
             if (!pomodoroTimer.getIsStarted()) {
+
+                EventBus.getDefault().post(WorkingTimerEvent(null))
+                EventBus.getDefault().post(WorkingTimerEvent(pomodoroTimer))
+
                 listener.start(pomodoroTimer.getId(), pomodoroTimer.getCurrentTimeMs())
-                EventBus.getDefault().post(WorkingTimerEvent(null))
             } else {
+
                 EventBus.getDefault().post(WorkingTimerEvent(null))
+
                 listener.stop(pomodoroTimer.getId(), pomodoroTimer.getCurrentTimeMs())
             }
         }
         binding.delete.setOnClickListener {
+
+            if (pomodoroTimer.getIsStarted()) {
+                EventBus.getDefault().post(WorkingTimerEvent(null))
+            }
+
             listener.delete(pomodoroTimer.getId())
         }
     }
 
     private fun startTimer(pomodoroTimer: PomodoroTimer) {
-        setItemStyle(pomodoroTimer)
+        setItemStyle(pomodoroTimer) // set style
 
-        timer?.cancel()
-        timer = getCountDownTimer(pomodoroTimer)
-        timer?.start()
+        timer?.cancel() // delete stop previous timer if it started
+        timer = getCountDownTimer(pomodoroTimer) // replace or create new timer
+        timer?.start() // start timer
 
         binding.dot.isInvisible = false
-        (binding.dot.background as? AnimationDrawable)?.start()
+        (binding.dot.background as? AnimationDrawable)?.start() // start animation dot
     }
 
     private fun stopTimer(pomodoroTimer: PomodoroTimer) {
-        setItemStyle(pomodoroTimer)
+        setItemStyle(pomodoroTimer) // set style
 
-        timer?.cancel()
+        timer?.cancel() // stop timer
 
         binding.dot.isInvisible = true
-        (binding.dot.background as? AnimationDrawable)?.stop()
+        (binding.dot.background as? AnimationDrawable)?.stop() // stop animation dot
     }
 
     private fun setItemStyle(pomodoroTimer: PomodoroTimer) = binding.run {
@@ -108,12 +118,10 @@ class PomodoroTimerViewHolder(
                 TIMER_INTERVAL) {
 
             override fun onTick(millisUntilFinished: Long) {
-                binding.circleClock.setCurrent(millisUntilFinished)
+                binding.circleClock.setCurrent(millisUntilFinished) // set current time to draw custom view
 
                 pomodoroTimer.setCurrentTimeMs(pomodoroTimer.getRunningTimeMs() - System.currentTimeMillis())
-                binding.timer.text = pomodoroTimer.getCurrentTimeMs().displayTime()
-
-                EventBus.getDefault().post(WorkingTimerEvent(pomodoroTimer))
+                binding.timer.text = pomodoroTimer.getCurrentTimeMs().displayTime() // display time
             }
 
             override fun onFinish() {
